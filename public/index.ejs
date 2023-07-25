@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Recipe App</title>
+
+  <script src="/javascripts/index.js" defer></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</head>
+<body>
+  <nav>
+    <div class="nav-wrapper">
+      <a href="#" class="brand-logo">Logo</a>
+      <ul id="nav-mobile" class="right hide-on-med-and-down">
+      <input type="search" id="search-bar" placeholder="Search for recipe...">
+      </ul>
+    </div>
+  </nav>
+  <div class="container">
+    
+    <% if (typeof name !== 'undefined')  { %>
+      <div class="col">
+        <h1 id="recipe-name">Recipe: <%= name %></h1>
+        <h2>Instructions:</h2>
+        <ul id="instructions">
+          <% instructions.forEach((instruction, i) => { %>
+            <li><%= (i + 1) + '. ' + instruction %></li>
+          <% }); %>
+        </ul>
+        <h2>Ingredients:</h2>
+        <ul id="ingredients">
+          <% ingredients.forEach(ingredient => { %>
+            <li><%= ingredient %></li>
+          <% }); %>
+        </ul>
+      </div>
+      <% } else{ %>
+        <div class="col">
+          <h1 id="recipe-name"></h1>
+          <h2>Instructions:</h2>
+          <ul id="instructions">
+          </ul>
+          <h2>Ingredients:</h2>
+          <ul id="ingredients">
+
+          </ul>
+        </div>
+    <% } %>
+    
+  <div class="col">
+    <h1>Add New Recipe</h1>
+    <label for="name-text">Name:</label>
+    <input type="text" id="name-text">
+    <h4>Ingredients</h4>
+    <textarea id="ingredients-text"></textarea>
+    <button class="btn" id="add-ingredient" type="button">Add ingredient</button>
+    <h4>Instructions</h4>
+    <textarea id="instructions-text"></textarea>
+    <button class="btn" id="add-instruction" type="button">Add instruction</button>
+    <form id="image-form" enctype="multipart/form-data">
+      <input type="file" id="image-input" name="images" accept="image/*" multiple>
+    </form>
+    <h4>Categories</h4>
+    <label>
+      <input type="checkbox" name="categories" value="Gluten-free">
+      <span>Gluten-free</span>
+    </label>
+    <br>
+    <label>
+      <input type="checkbox" name="categories" value="Vegan">
+      <span>Vegan</span>
+    </label>
+    <br>
+    <label>
+      <input type="checkbox" name="categories" value="Ovo">
+      <span>Ovo</span>
+    </label>
+    <br>
+    <button class="btn" id="submit" type="submit">Submit</button>
+</div>
+</div>
+</body>
+</html>
