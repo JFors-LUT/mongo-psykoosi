@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const Recipe = require('../models/Recipes'); 
+const Category = require('../models/Category'); 
 const router = express.Router();
 
 
@@ -47,7 +48,6 @@ router.get('/:food', async (req, res) => {
 
   try {
     const recipe = await Recipe.findOne({ name: food }).exec();
-
     if (acceptHeader && acceptHeader.includes('application/xml')) {
       if (recipe !== null) {
         res.render('index', recipe);
@@ -89,34 +89,35 @@ router.get('/:food', async (req, res) => {
   }
 });*/
 
-router.post('/', (req, res, next) => {
+router.post('/', async (req, res, next) => {
   const food = capitalizeFirstLetter(req.body.name);
-  Recipe.findOne({ name: food }) 
-    .exec()
-    .then((recipe) => {
-      if (!recipe) {
-        return Recipe.create({
-          name: food,
-          instructions: req.body.instructions,
-          ingredients: req.body.ingredients,
-          categories: req.body.categories
-        });
-      } else {
-        return Promise.reject('Recipe already in database.');
-      }
-    })
-    .then((recipe) => {
-      console.log('Recipe added successfully:', recipe);
-      res.status(200).json({ message: 'Recipe added successfully', recipe });
-    })
-    .catch((error) => {
-      if (error === 'Recipe already in database.') {
-        return res.status(403).json(error);;
-      } else {
-        console.error('Error adding recipe:', error);
-        return res.status(500).json({ message: 'Error adding recipe' });
-      }
+
+  try {
+    const recipe = await Recipe.findOne({ name: food }).exec();
+    if (recipe) {
+      return res.status(403).json('Recipe already in database.');
+    }
+
+    const categoryNames = req.body.categories;
+
+    const categories = await Category.find({ name: { $in: categoryNames } }).exec();
+
+    const foundCategoryNames = categories.map((category) => category.name);
+    const newRecipe = new Recipe({
+      name: food,
+      instructions: req.body.instructions,
+      ingredients: req.body.ingredients,
+      categories: categories.map((category) => category._id.toString()),
     });
+
+    await newRecipe.save();
+
+    console.log('Recipe added successfully:', newRecipe);
+    res.status(200).json({ message: 'Recipe added successfully', recipe: newRecipe });
+  } catch (error) {
+    console.error('Error adding recipe:', error);
+    return res.status(500).json({ message: 'Error adding recipe' });
+  }
 });
 
 function capitalizeFirstLetter(str) {
